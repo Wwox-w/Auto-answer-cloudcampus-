@@ -75,14 +75,18 @@ class AnswerEngine:
 
                 # 等待用户在浏览器中导航到答题页
                 waited = 0
-                while not self._stop_flag.is_set() and waited < 120:
+                while not self._stop_flag.is_set() and waited < 300:
                     time.sleep(1)
                     waited += 1
-                    has_questions = page.evaluate(
-                        '() => document.querySelectorAll(".que").length > 0'
-                    )
-                    if has_questions:
-                        break
+                    try:
+                        has_questions = page.evaluate(
+                            '() => document.querySelectorAll(".que").length > 0'
+                        )
+                        if has_questions:
+                            break
+                    except Exception:
+                        # 页面导航中，执行上下文暂时不可用，继续等待
+                        pass
 
                 if self._stop_flag.is_set():
                     browser.close()
