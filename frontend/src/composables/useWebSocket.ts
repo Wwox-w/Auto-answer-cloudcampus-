@@ -7,8 +7,8 @@ export function useWebSocket() {
   const store = useSessionStore()
 
   function connect() {
-    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const url = `${protocol}//${location.host}/ws/progress`
+    // 直连后端 WebSocket，绕过 Vite 代理避免协议升级问题
+    const url = `ws://localhost:8000/ws/progress`
     ws.value = new WebSocket(url)
 
     ws.value.onopen = () => {
