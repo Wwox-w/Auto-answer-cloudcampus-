@@ -39,6 +39,8 @@ export function useWebSocket() {
         break
       case 'page_start':
         store.currentPage = data.page
+        store.questions = []
+        store.codeQuestions = []
         store.addLog(`进入第 ${data.page} 页`)
         break
       case 'questions_loaded':

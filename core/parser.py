@@ -124,28 +124,32 @@ def parse_questions(page: Page) -> list[dict]:
         // 2. 选择题（multichoice — 单选/多选）
         // ============================================================
         document.querySelectorAll('.que.multichoice').forEach((q) => {
-            const checkboxes = q.querySelectorAll('.answer input[type="checkbox"]');
-            const radios = q.querySelectorAll('.answer input[type="radio"]');
+            // 先精确查找 .answer 内的选项
+            let checkboxes = q.querySelectorAll('.answer input[type="checkbox"]');
+            let radios = q.querySelectorAll('.answer input[type="radio"]');
+
+            // 回退：Moodle 4.x 选项可能在 .answer 之外
+            if (checkboxes.length === 0 && radios.length === 0) {
+                checkboxes = q.querySelectorAll('input[type="checkbox"]');
+                radios = q.querySelectorAll('input[type="radio"]');
+            }
+
             const isMulti = checkboxes.length > 0;
             const inputs = isMulti ? checkboxes : radios;
 
-            // 也尝试查找 Moodle 4.x 的选项结构
-            const allInputs = inputs.length > 0 ? inputs :
-                q.querySelectorAll('.answer input[type="radio"], .answer input[type="checkbox"]');
-
             const options = [];
-            allInputs.forEach(inp => {
+            inputs.forEach(inp => {
                 options.push({
                     value: inp.value,
                     label: getOptionLabel(inp),
                     name: inp.name,
-                    checked: inp.checked  // 标记是否已选中
+                    checked: inp.checked
                 });
             });
 
             if (options.length > 0) {
                 results.push({
-                    type: isMulti || checkboxes.length > 0 ? 'multichoice_multi' : 'multichoice',
+                    type: isMulti ? 'multichoice_multi' : 'multichoice',
                     id: q.id,
                     text: getQuestionText(q),
                     options: options
