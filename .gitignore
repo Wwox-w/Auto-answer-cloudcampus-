@@ -7,8 +7,9 @@ __pycache__/
 *.pyc
 venv/
 
-# 登录态
+# 登录态与数据
 auth.json
+history/
 
 # 日志
 logs/
