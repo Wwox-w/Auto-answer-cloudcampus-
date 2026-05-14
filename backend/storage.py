@@ -56,6 +56,7 @@ def list_history(limit: int = 20) -> list[dict]:
             results.append({
                 "id": f.stem,
                 "date": d.get("date", ""),
+                "status": d.get("status", "completed"),
                 "total_questions": d.get("total_questions", 0),
                 "pages": d.get("pages", 0),
                 "model": d.get("model", ""),

@@ -192,6 +192,7 @@ class AnswerEngine:
             save_history(
                 session_id,
                 {
+                    "status": "completed",
                     "date": datetime.now().isoformat(),
                     "total_questions": len(session_questions),
                     "pages": page_count,
