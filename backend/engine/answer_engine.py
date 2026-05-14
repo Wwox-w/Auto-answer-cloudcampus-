@@ -46,7 +46,10 @@ class AnswerEngine:
     def _run(self):
         class _Cfg:
             def __init__(self, d):
-                self.__dict__.update(d)
+                # 同时设置 lowercase 和 UPPERCASE 属性，兼容旧代码
+                for k, v in d.items():
+                    setattr(self, k, v)
+                    setattr(self, k.upper(), v)
 
         cfg = _Cfg(self.config)
 
