@@ -1,11 +1,11 @@
-"""Auto-Answer Web 后端入口"""
-import os
-import sys
+"""Auto-Answer Web 后端入口
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
+启动方式（从项目根目录）:
+    uvicorn backend.main:app --host 0.0.0.0 --port 8000
+"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from backend.routes.config import router as config_router
 from backend.routes.session import router as session_router
 from backend.routes.history import router as history_router
