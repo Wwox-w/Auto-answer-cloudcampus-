@@ -1,13 +1,23 @@
 """本地 JSON 文件存储"""
 import json
-import os
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONFIG_FILE = BASE_DIR / "config.json"
 AUTH_FILE = BASE_DIR / "auth.json"
 HISTORY_DIR = BASE_DIR / "history"
 HISTORY_DIR.mkdir(exist_ok=True)
+
+
+def _safe_history_path(session_id: str) -> Path:
+    """构造安全的 history 文件路径，防止路径遍历"""
+    f = (HISTORY_DIR / f"{session_id}.json").resolve()
+    if not str(f).startswith(str(HISTORY_DIR.resolve())):
+        raise ValueError(f"Invalid session_id: {session_id}")
+    return f
 
 
 def read_config() -> dict:
@@ -51,13 +61,13 @@ def list_history(limit: int = 20) -> list[dict]:
                 "model": d.get("model", ""),
             })
         except json.JSONDecodeError:
-            pass
+            logger.warning(f"跳过损坏的历史文件: {f.name}")
     return results
 
 
 def get_history_detail(session_id: str) -> dict | None:
     """获取某次答题的详细记录"""
-    f = HISTORY_DIR / f"{session_id}.json"
+    f = _safe_history_path(session_id)
     if f.exists():
         return json.loads(f.read_text())
     return None
@@ -65,5 +75,5 @@ def get_history_detail(session_id: str) -> dict | None:
 
 def save_history(session_id: str, data: dict) -> None:
     """保存答题记录"""
-    f = HISTORY_DIR / f"{session_id}.json"
+    f = _safe_history_path(session_id)
     f.write_text(json.dumps(data, indent=2, ensure_ascii=False))
