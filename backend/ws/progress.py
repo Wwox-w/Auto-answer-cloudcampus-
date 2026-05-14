@@ -1,6 +1,9 @@
 """WebSocket 进度管理器"""
 import asyncio
+import logging
 from fastapi import WebSocket
+
+logger = logging.getLogger(__name__)
 
 
 class ProgressManager:
@@ -13,10 +16,12 @@ class ProgressManager:
     async def connect(self, ws: WebSocket):
         await ws.accept()
         self._connections.append(ws)
+        logger.info(f"WebSocket 客户端已连接 (当前 {len(self._connections)} 个)")
 
     def disconnect(self, ws: WebSocket):
         if ws in self._connections:
             self._connections.remove(ws)
+            logger.info(f"WebSocket 客户端已断开 (剩余 {len(self._connections)} 个)")
 
     def set_engine(self, engine):
         self._engine = engine

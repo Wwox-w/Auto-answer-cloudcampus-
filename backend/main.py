@@ -3,7 +3,10 @@
 启动方式（从项目根目录）:
     uvicorn backend.main:app --host 0.0.0.0 --port 8000
 """
-from fastapi import FastAPI, WebSocket
+import logging
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+
+logging.basicConfig(level=logging.INFO)
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes.config import router as config_router
@@ -41,5 +44,9 @@ async def ws_progress_endpoint(ws: WebSocket):
                 await ws.send_json({"type": "heartbeat", "status": "alive"})
             elif data.get("type") == "confirm_code":
                 await ws.send_json({"type": "code_confirmed"})
-    except Exception:
+    except WebSocketDisconnect:
+        logging.info("WebSocket 客户端正常断开")
+    except Exception as e:
+        logging.error(f"WebSocket 异常: {type(e).__name__}: {e}")
+    finally:
         progress_manager.disconnect(ws)
