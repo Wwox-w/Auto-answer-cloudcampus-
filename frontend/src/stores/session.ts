@@ -15,6 +15,7 @@ export const useSessionStore = defineStore('session', () => {
   const questions = ref<Question[]>([])
   const logs = ref<string[]>([])
   const codeQuestions = ref<Question[]>([])
+  const usage = ref({ prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 })
 
   const currentQuestion = computed(() =>
     questions.value.find(q => q.status === 'solving') || questions.value[questions.value.length - 1]
@@ -31,7 +32,8 @@ export const useSessionStore = defineStore('session', () => {
     questions.value = []
     logs.value = []
     codeQuestions.value = []
+    usage.value = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
   }
 
-  return { running, currentPage, questions, logs, codeQuestions, currentQuestion, addLog, reset }
+  return { running, currentPage, questions, logs, codeQuestions, usage, currentQuestion, addLog, reset }
 })

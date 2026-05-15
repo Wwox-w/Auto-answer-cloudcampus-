@@ -144,6 +144,20 @@ function cancelStop() {
             <span class="tabular-nums">{{ store.questions.length }}</span>
             <span>题</span>
           </div>
+
+          <!-- Token usage -->
+          <div
+            v-if="store.usage.total_tokens > 0"
+            class="flex items-center gap-1.5 text-xs text-muted-foreground ml-2 pl-2 border-l border-border"
+          >
+            <span class="tabular-nums font-mono text-foreground">
+              {{ (store.usage.total_tokens / 1000).toFixed(1) }}K
+            </span>
+            <span>tokens</span>
+            <span class="text-emerald-400 font-mono tabular-nums">
+              ~¥{{ (store.usage.total_tokens / 1000000 * 2).toFixed(4) }}
+            </span>
+          </div>
         </div>
 
         <!-- Right: Actions -->

@@ -53,6 +53,9 @@ export function useWebSocket() {
       case 'answer_generated':
         updateQuestion(data.number, { status: 'solved', answer: data.preview, type: data.type })
         store.addLog(`#${data.number} ${data.type} → 答案已生成`)
+        if (data.usage) {
+          store.usage = data.usage
+        }
         break
       case 'filling':
         store.addLog(data.message)

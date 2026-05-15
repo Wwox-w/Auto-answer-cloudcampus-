@@ -170,6 +170,7 @@ class AnswerEngine:
                             )
                             q["answer"] = solver.solve(q)
                             ans_preview = str(q["answer"])[:200]
+                            usage = solver.get_usage()
                             self._emit(
                                 "answer_generated",
                                 number=q["number"],
@@ -177,6 +178,7 @@ class AnswerEngine:
                                 text=q.get("text", "")[:200],
                                 answer=q["answer"],
                                 preview=ans_preview,
+                                usage=usage,
                             )
                         except Exception as e:
                             self._emit(

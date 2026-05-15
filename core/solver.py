@@ -15,11 +15,21 @@ class Solver:
     def __init__(self, config: Config = None):
         self.config = config or Config()
         self.client = None
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
         if self.config.LLM_API_KEY:
             self.client = OpenAI(
                 api_key=self.config.LLM_API_KEY,
                 base_url=self.config.LLM_API_BASE
             )
+
+    def get_usage(self) -> dict:
+        """返回累计 token 用量"""
+        return {
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "total_tokens": self.prompt_tokens + self.completion_tokens,
+        }
 
     def solve(self, question: dict) -> str | dict:
         """根据题目类型调用对应求解方法"""
@@ -205,6 +215,9 @@ class Solver:
                     ],
                     temperature=0.1,  # 低温度确保答案稳定
                 )
+                if resp.usage:
+                    self.prompt_tokens += resp.usage.prompt_tokens
+                    self.completion_tokens += resp.usage.completion_tokens
                 return resp.choices[0].message.content or ""
 
             except Exception as e:
