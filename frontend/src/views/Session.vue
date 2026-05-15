@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   Play,
   Square,
@@ -30,6 +30,14 @@ const connectionStatusText = () => {
   if (connected.value) return '已连接'
   return '连接中...'
 }
+
+// DeepSeek V4 Pro 定价: 输入 ¥3/M, 输出 ¥6/M
+const costText = computed(() => {
+  const u = store.usage
+  const cost = (u.prompt_tokens / 1_000_000) * 3 + (u.completion_tokens / 1_000_000) * 6
+  if (cost < 0.01) return '< ¥0.01'
+  return '¥' + cost.toFixed(3)
+})
 
 const connectionDotClass = () => {
   if (!store.running) return 'bg-muted-foreground/40'
@@ -154,8 +162,9 @@ function cancelStop() {
               {{ (store.usage.total_tokens / 1000).toFixed(1) }}K
             </span>
             <span>tokens</span>
-            <span class="text-emerald-400 font-mono tabular-nums">
-              ~¥{{ (store.usage.total_tokens / 1000000 * 2).toFixed(4) }}
+            <span class="text-muted-foreground">·</span>
+            <span class="tabular-nums font-mono text-emerald-400">
+              {{ costText }}
             </span>
           </div>
         </div>
