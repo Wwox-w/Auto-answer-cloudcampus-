@@ -73,8 +73,8 @@ class AnswerEngine:
                 page.goto("https://www.cloudcampus.com.cn/")
 
                 # 自动检测登录表单并填入账号密码
-                username = cfg.username or ""
-                password = cfg.password or ""
+                username = getattr(cfg, "username", "") or ""
+                password = getattr(cfg, "password", "") or ""
                 if username and password:
                     try:
                         # 等待登录表单出现
