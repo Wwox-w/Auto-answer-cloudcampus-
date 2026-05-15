@@ -77,43 +77,54 @@ class AnswerEngine:
                 password = getattr(cfg, "password", "") or ""
                 if username and password:
                     try:
-                        # 等待登录表单出现
-                        page.wait_for_selector(
-                            'input[type="text"], input[name*="user"], input[name*="login"], '
-                            'input[type="password"]',
-                            timeout=5000
+                        # 等待页面加载，检测登录表单（多种选择器覆盖不同登录页）
+                        page.wait_for_load_state("networkidle")
+                        time.sleep(1)
+                        pwd_inputs = page.query_selector_all(
+                            'input[type="password"]'
                         )
-                        # 判断是否有密码框（登录页特征）
-                        pwd_inputs = page.query_selector_all('input[type="password"]')
                         if pwd_inputs:
                             self._emit("ready", message="检测到登录页，正在自动登录...")
-                            # 找用户名输入框
+                            # 找用户名输入框（扩宽选择器）
                             user_input = page.query_selector(
-                                'input[type="text"], input[name*="user"], input[name*="login"], '
-                                'input[name*="email"], input[name*="account"]'
+                                'input[type="text"], input[type="email"], '
+                                'input[name*="user"], input[name*="login"], '
+                                'input[name*="email"], input[name*="account"], '
+                                'input[name*="phone"], input[name*="mobile"], '
+                                'input[placeholder*="账号"], input[placeholder*="手机"], '
+                                'input[placeholder*="邮箱"], input[placeholder*="用户"], '
+                                'input[placeholder*="学号"]'
                             )
                             if user_input:
+                                user_input.click()
                                 user_input.fill(username)
-                                time.sleep(0.3)
+                                time.sleep(0.5)
                             # 填密码
+                            pwd_inputs[0].click()
                             pwd_inputs[0].fill(password)
-                            time.sleep(0.3)
+                            time.sleep(0.5)
                             # 找登录按钮
                             login_btn = page.query_selector(
                                 'button[type="submit"], input[type="submit"], '
                                 'button:has-text("登录"), button:has-text("登 录"), '
-                                'button:has-text("Login"), button:has-text("Sign in")'
+                                'a:has-text("登录"), '
+                                'button:has-text("Login"), button:has-text("Sign in"), '
+                                'input[value*="登录"]'
                             )
                             if login_btn:
                                 login_btn.click()
                                 page.wait_for_load_state("networkidle")
-                                # 保存新登录态
                                 context.storage_state(path="auth.json")
                                 self._emit("ready", message="自动登录成功，请进入答题页面")
                             else:
-                                self._emit("ready", message="已填入账号密码，请手动点击登录")
+                                # 尝试回车提交
+                                pwd_inputs[0].press("Enter")
+                                time.sleep(2)
+                                page.wait_for_load_state("networkidle")
+                                context.storage_state(path="auth.json")
+                                self._emit("ready", message="已尝试登录，请进入答题页面")
                         else:
-                            self._emit("ready", message="浏览器已打开，请进入答题页面")
+                            self._emit("ready", message="已登录（无需重复登录），请进入答题页面")
                     except Exception:
                         self._emit("ready", message="浏览器已打开，请进入答题页面")
                 else:
