@@ -344,7 +344,7 @@ const commonModels = [
           <div>
             <label class="mb-1.5 block text-sm font-medium text-foreground">用户名</label>
             <input
-              v-model="form.account.username"
+              v-model="form.username"
               type="text"
               placeholder="学号或手机号"
               class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
@@ -353,7 +353,7 @@ const commonModels = [
           <div>
             <label class="mb-1.5 block text-sm font-medium text-foreground">密码</label>
             <input
-              v-model="form.account.password"
+              v-model="form.password"
               :type="showPwd ? 'text' : 'password'"
               placeholder="登录密码"
               class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
