@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ShieldAlert,
+  User,
 } from 'lucide-vue-next'
 import { SwitchRoot, SwitchThumb } from 'radix-vue'
 import NavBar from '@/components/NavBar.vue'
@@ -27,6 +28,8 @@ const form = reactive({
   llm_api_base: '',
   llm_api_key: '',
   llm_model: '',
+  username: '',
+  password: '',
   headless: false,
   slow_mo: 300,
   page_timeout: 30000,
@@ -34,6 +37,7 @@ const form = reactive({
 
 // --- UI state ---
 const showApiKey = ref(false)
+const showPwd = ref(false)
 const saving = ref(false)
 const saveSuccess = ref(false)
 const saveError = ref('')
@@ -59,6 +63,15 @@ watch(
     form.headless = browser.headless
     form.slow_mo = browser.slow_mo
     form.page_timeout = browser.page_timeout
+  },
+  { immediate: true },
+)
+
+watch(
+  () => configStore.account,
+  (acct) => {
+    form.username = acct.username
+    form.password = acct.password
   },
   { immediate: true },
 )
@@ -99,6 +112,8 @@ async function handleSave() {
     configStore.browser.headless = form.headless
     configStore.browser.slow_mo = form.slow_mo
     configStore.browser.page_timeout = form.page_timeout
+    configStore.account.username = form.username
+    configStore.account.password = form.password
 
     await configStore.saveConfig()
     saveSuccess.value = true
@@ -308,6 +323,41 @@ const commonModels = [
               <option v-for="m in commonModels" :key="m" :value="m" />
             </datalist>
             <p :class="helperBase">模型标识符，如 gpt-4o、deepseek-chat 等</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Account Section (hidden) ============ -->
+      <section class="mb-6 overflow-hidden rounded-xl border border-border bg-card">
+        <div class="flex items-center gap-3 border-b border-border/60 px-5 py-4">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-400/10">
+            <User class="h-4 w-4 text-amber-400" />
+          </div>
+          <div>
+            <h2 class="text-sm font-semibold text-foreground">云校园账号</h2>
+            <p class="mt-0.5 text-xs text-muted-foreground">
+              开启后将自动检测登录页并填入账号密码
+            </p>
+          </div>
+        </div>
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-foreground">用户名</label>
+            <input
+              v-model="form.account.username"
+              type="text"
+              placeholder="学号或手机号"
+              class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-foreground">密码</label>
+            <input
+              v-model="form.account.password"
+              :type="showPwd ? 'text' : 'password'"
+              placeholder="登录密码"
+              class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring"
+            />
           </div>
         </div>
       </section>

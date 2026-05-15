@@ -13,9 +13,15 @@ export interface BrowserConfig {
   page_timeout: number
 }
 
+export interface AccountConfig {
+  username: string
+  password: string
+}
+
 export const useConfigStore = defineStore('config', () => {
   const llm = ref<LLMConfig>({ llm_api_base: '', llm_api_key: '', llm_model: '' })
   const browser = ref<BrowserConfig>({ headless: false, slow_mo: 300, page_timeout: 30000 })
+  const account = ref<AccountConfig>({ username: '', password: '' })
   const hasAuth = ref(false)
   const loading = ref(false)
 
@@ -24,6 +30,7 @@ export const useConfigStore = defineStore('config', () => {
     const data = await res.json()
     llm.value = data.llm
     browser.value = data.browser
+    account.value = data.account || { username: '', password: '' }
     hasAuth.value = data.has_auth
   }
 
@@ -32,10 +39,15 @@ export const useConfigStore = defineStore('config', () => {
     await fetch('/api/config', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ llm: llm.value, browser: browser.value, answer: {} }),
+      body: JSON.stringify({
+        llm: llm.value,
+        browser: browser.value,
+        answer: {},
+        account: account.value,
+      }),
     })
     loading.value = false
   }
 
-  return { llm, browser, hasAuth, loading, fetchConfig, saveConfig }
+  return { llm, browser, account, hasAuth, loading, fetchConfig, saveConfig }
 })
