@@ -89,7 +89,6 @@ class AnswerEngine:
                         pass
 
                 if self._stop_flag.is_set():
-                    browser.close()
                     return
 
                 for page_idx in range(20):
@@ -182,7 +181,7 @@ class AnswerEngine:
                     time.sleep(0.5)
 
                 context.storage_state(path="auth.json")
-                browser.close()
+                # 浏览器保持打开，用户可以手动检查答案
 
         except Exception as e:
             self._emit("error", message=f"引擎异常: {e}")
