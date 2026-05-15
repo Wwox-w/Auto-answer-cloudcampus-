@@ -23,10 +23,16 @@ class AnswerConfig(BaseModel):
     max_retries: int = 3
 
 
+class AccountConfig(BaseModel):
+    username: str = ""
+    password: str = ""
+
+
 class FullConfig(BaseModel):
     llm: LLMConfig = LLMConfig()
     browser: BrowserConfig = BrowserConfig()
     answer: AnswerConfig = AnswerConfig()
+    account: AccountConfig = AccountConfig()
 
 
 @router.get("/config")
@@ -46,10 +52,15 @@ async def get_config():
         answer_delay=data.get("answer_delay", [1.0, 3.0]),
         max_retries=data.get("max_retries", 3),
     )
+    account = AccountConfig(
+        username=data.get("username", ""),
+        password=data.get("password", ""),
+    )
     return {
         "llm": llm.model_dump(),
         "browser": browser.model_dump(),
         "answer": answer.model_dump(),
+        "account": account.model_dump(),
         "has_auth": check_auth(),
     }
 
@@ -60,6 +71,7 @@ async def update_config(config: FullConfig):
         **config.llm.model_dump(),
         **config.browser.model_dump(),
         **config.answer.model_dump(),
+        **config.account.model_dump(),
     }
     write_config(data)
     return {"status": "saved"}

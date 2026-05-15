@@ -28,6 +28,8 @@ def read_config() -> dict:
         "llm_api_base": "https://api.deepseek.com/v1",
         "llm_api_key": "",
         "llm_model": "deepseek-chat",
+        "username": "",
+        "password": "",
         "headless": False,
         "slow_mo": 300,
         "page_timeout": 30000,
